@@ -1,0 +1,2041 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kembara Kata Adjektif Pancaindera - Tahun 3 (Tema: Kebersihan)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --grass-1: #9be164;
+            --grass-2: #75c644;
+            --grass-3: #52a328;
+            --wood-dark: #633913;
+            --wood-mid: #a86e39;
+            --wood-light: #f6e0b3;
+            --wood-cream: #fff9eb;
+            --stesen1-blue: #2f80ed;
+            --stesen1-dark: #1b5299;
+            --stesen2-cyan: #72c7f0;
+            --stesen2-dark: #287ca8;
+            --stesen3-pink: #df5480;
+            --stesen3-dark: #9e274e;
+            --gold: #ffbe2e;
+            --text-dark: #42250b;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 12px;
+            font-family: 'Nunito', 'Segoe UI', Tahoma, sans-serif;
+            color: var(--text-dark);
+            background: radial-gradient(circle at 50% 25%, #a2e86c 0%, #68b838 60%, #468e20 100%);
+            min-height: 100vh;
+            user-select: none;
+            overflow-x: hidden;
+        }
+
+        .game-shell {
+            max-width: 1120px;
+            margin: 0 auto;
+        }
+
+        /* ======================== PETA PERMAINAN DINAMIK ======================== */
+        .game-stage {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            min-height: 540px;
+            border-radius: 26px;
+            border: 6px solid var(--wood-dark);
+            box-shadow:
+                0 16px 38px rgba(24, 58, 10, 0.5),
+                inset 0 0 40px rgba(255, 255, 200, 0.35);
+            overflow: hidden;
+            background:
+                radial-gradient(circle at 22% 35%, rgba(182, 245, 128, 0.85) 0%, transparent 45%),
+                radial-gradient(circle at 75% 65%, rgba(168, 238, 114, 0.75) 0%, transparent 48%),
+                linear-gradient(180deg, #8cd957 0%, #71c33f 55%, #5cb02e 100%);
+        }
+
+        /* Lapisan SVG Latar & Laluan Jalan */
+        .world-svg {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        /* ======================== BAR ATAS (HUD) ======================== */
+        .hud-top {
+            position: absolute;
+            top: 14px;
+            left: 16px;
+            right: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 30;
+            pointer-events: none;
+        }
+
+        .hud-top > * {
+            pointer-events: auto;
+        }
+
+        /* Butang Skor Kiri */
+        .hud-score-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(180deg, #fae8c3 0%, #edd099 100%);
+            border: 3.5px solid var(--wood-dark);
+            border-radius: 999px;
+            padding: 5px 20px 5px 7px;
+            cursor: pointer;
+            box-shadow: 0 5px 0 rgba(99, 57, 19, 0.45), inset 0 2px 0 rgba(255,255,255,0.8);
+            transition: transform 0.15s;
+            font-family: 'Fredoka', sans-serif;
+            font-size: clamp(0.95rem, 1.6vw, 1.25rem);
+            font-weight: 700;
+            color: var(--wood-dark);
+        }
+
+        .hud-score-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .hud-score-btn:active {
+            transform: scale(0.97);
+        }
+
+        .coin-badge {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 32% 30%, #fff394 0%, #f6bd2b 55%, #d6850a 100%);
+            border: 2.5px solid #8c5305;
+            box-shadow: inset 0 0 0 3px rgba(255, 232, 133, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            color: #7d4700;
+        }
+
+        /* Bar Kemajuan Matahari Tengah */
+        .hud-progress-wrap {
+            display: flex;
+            align-items: center;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.15s;
+        }
+
+        .hud-progress-wrap:hover {
+            transform: scale(1.03);
+        }
+
+        .sun-hud-icon {
+            width: 54px;
+            height: 54px;
+            margin-right: -18px;
+            z-index: 2;
+            filter: drop-shadow(0 3px 4px rgba(0,0,0,0.22));
+            animation: gentleSpin 18s linear infinite;
+        }
+
+        @keyframes gentleSpin {
+            0%, 100% { transform: rotate(-6deg) scale(1); }
+            50% { transform: rotate(6deg) scale(1.06); }
+        }
+
+        .progress-shell {
+            width: clamp(170px, 24vw, 275px);
+            height: 32px;
+            background: #8c5930;
+            border: 3.5px solid #f7e3b6;
+            outline: 3px solid var(--wood-dark);
+            border-radius: 999px;
+            padding: 3px 4px 3px 16px;
+            box-shadow: 0 5px 0 rgba(99, 57, 19, 0.4), inset 0 3px 5px rgba(0,0,0,0.35);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 20%;
+            background: linear-gradient(180deg, #98f564 0%, #58c92b 60%, #43a11b 100%);
+            border-radius: 999px;
+            box-shadow: inset 0 2px 0 rgba(255,255,255,0.65);
+            transition: width 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        /* Butang MENU Kanan & Bunyi */
+        .hud-right-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .hud-wood-btn {
+            background: linear-gradient(180deg, #c68f56 0%, #9c6733 100%);
+            color: #fff8e7;
+            border: 3px solid #f7e3b6;
+            outline: 3px solid var(--wood-dark);
+            border-radius: 12px;
+            padding: 7px 18px;
+            font-family: 'Fredoka', sans-serif;
+            font-size: clamp(0.9rem, 1.4vw, 1.12rem);
+            font-weight: 700;
+            letter-spacing: 0.6px;
+            cursor: pointer;
+            box-shadow: 0 5px 0 rgba(75, 42, 12, 0.5);
+            text-shadow: 0 2px 2px rgba(0,0,0,0.35);
+            transition: transform 0.15s, filter 0.15s;
+        }
+
+        .hud-wood-btn:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.08);
+        }
+
+        .hud-wood-btn:active {
+            transform: translateY(2px);
+        }
+
+        /* ======================== STESEN-STESEN DI ATAS PETA ======================== */
+        .station-node {
+            position: absolute;
+            z-index: 15;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: transform 0.25s ease;
+        }
+
+        .station-node:hover {
+            transform: translateY(-4px);
+        }
+
+        /* Reben Tajuk Stesen */
+        .ribbon-banner {
+            position: relative;
+            border: 3px solid var(--wood-dark);
+            border-radius: 12px;
+            padding: 7px 18px;
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 700;
+            font-size: clamp(0.78rem, 1.35vw, 1.05rem);
+            color: #fff;
+            text-shadow: 0 2px 2px rgba(0,0,0,0.35);
+            cursor: pointer;
+            box-shadow: 0 6px 0 rgba(50, 30, 10, 0.32), inset 0 2px 0 rgba(255,255,255,0.45);
+            transition: transform 0.15s, filter 0.15s;
+            text-align: center;
+            line-height: 1.15;
+            z-index: 3;
+        }
+
+        .ribbon-banner:hover {
+            transform: scale(1.06);
+            filter: brightness(1.08);
+        }
+
+        .ribbon-blue {
+            background: linear-gradient(180deg, #4393ff 0%, #2468cc 100%);
+            border-color: #163f82;
+        }
+
+        .ribbon-cyan {
+            background: linear-gradient(180deg, #98defc 0%, #58b5e3 100%);
+            border-color: #256485;
+            color: #163247;
+            text-shadow: 0 1px 0 rgba(255,255,255,0.7);
+        }
+
+        .ribbon-pink {
+            background: linear-gradient(180deg, #ef6690 0%, #cc3967 100%);
+            border-color: #7d193a;
+        }
+
+        /* Papan Tanda Kayu Stesen (Daripada Gambar Rujukan Stesen 1, 2, 3) */
+        .wood-sign-svg {
+            width: 86%;
+            max-width: 235px;
+            height: auto;
+            display: block;
+            cursor: pointer;
+            filter: drop-shadow(0 5px 8px rgba(0,0,0,0.28));
+            transition: transform 0.18s, filter 0.18s;
+            z-index: 4;
+            user-select: none;
+        }
+
+        .wood-sign-svg:hover {
+            transform: scale(1.06) rotate(-1deg);
+            filter: brightness(1.06) drop-shadow(0 7px 12px rgba(0,0,0,0.34));
+        }
+
+        /* Pentas Ilustrasi Penuh di Dalam Modal Setiap Stesen (stesen1.jpg, stesen2.jpg, stesen3.jpg) */
+        .station-scene-stage {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1024 / 571;
+            max-height: 330px;
+            border-radius: 18px;
+            border: 4px solid var(--wood-dark);
+            background-size: cover;
+            background-position: center;
+            overflow: hidden;
+            margin-bottom: 16px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.22);
+        }
+
+        .scene-doctor-actor {
+            position: absolute;
+            width: clamp(68px, 11%, 98px);
+            bottom: 6%;
+            left: 12%;
+            filter: drop-shadow(0 5px 8px rgba(0,0,0,0.35));
+            animation: sceneDoctorWalkIn 1.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        @keyframes sceneDoctorWalkIn {
+            0% { transform: translateX(-60px) translateY(15px) scale(0.85); opacity: 0.3; }
+            35% { transform: translateX(-30px) translateY(-6px) rotate(-5deg) scale(0.95); opacity: 1; }
+            70% { transform: translateX(-10px) translateY(0px) rotate(5deg) scale(1); }
+            100% { transform: translateX(0) translateY(0) rotate(0deg) scale(1); opacity: 1; }
+        }
+
+        .scene-hotspot-pill {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.94);
+            color: var(--wood-dark);
+            border: 2.5px solid var(--wood-dark);
+            border-radius: 999px;
+            padding: 4px 12px;
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 700;
+            font-size: clamp(0.72rem, 1.15vw, 0.9rem);
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+            transition: transform 0.15s, background 0.15s;
+            z-index: 6;
+            animation: bobSpeech 2.5s infinite ease-in-out;
+        }
+
+        .scene-hotspot-pill:hover {
+            transform: scale(1.12) !important;
+            background: #fff3bf;
+        }
+
+        /* --- STESEN 1: GIGI SIHAT (Kiri Atas) --- */
+        .stesen-1 {
+            left: 2.2%;
+            top: 10.5%;
+            width: 25.5%;
+        }
+
+        .s1-art {
+            width: 100%;
+            max-height: 175px;
+            object-fit: contain;
+            height: auto;
+            display: block;
+            margin-top: -6px;
+            cursor: pointer;
+            filter: drop-shadow(0 6px 10px rgba(0,0,0,0.22));
+            transition: transform 0.2s;
+            user-select: none;
+        }
+
+        .s1-art:hover {
+            transform: scale(1.04);
+        }
+
+        /* Bar 5 Buih + Butang Play [▶] seperti dalam rujukan */
+        .s1-bubble-row {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: -6px;
+            background: rgba(255, 255, 255, 0.35);
+            padding: 4px 8px;
+            border-radius: 999px;
+            backdrop-filter: blur(2px);
+        }
+
+        .mini-bubble-btn {
+            width: clamp(26px, 3.2vw, 38px);
+            height: clamp(26px, 3.2vw, 38px);
+            border-radius: 50%;
+            border: 2.5px solid #4589c4;
+            background: radial-gradient(circle at 30% 30%, #ffffff 0%, #bfe6ff 55%, #7ec2f7 100%);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(0.75rem, 1.1vw, 1rem);
+            box-shadow: 0 3px 6px rgba(0,0,0,0.16), inset 0 2px 3px #fff;
+            transition: transform 0.15s;
+            padding: 0;
+        }
+
+        .mini-bubble-btn:hover {
+            transform: scale(1.18);
+        }
+
+        .play-square-btn {
+            width: clamp(32px, 3.7vw, 44px);
+            height: clamp(30px, 3.5vw, 40px);
+            border-radius: 10px;
+            background: linear-gradient(180deg, #d19b66 0%, #996433 100%);
+            border: 2.5px solid var(--wood-dark);
+            padding: 3px;
+            cursor: pointer;
+            box-shadow: 0 4px 0 rgba(70, 40, 12, 0.45);
+            transition: transform 0.15s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .play-square-btn:hover {
+            transform: scale(1.12);
+        }
+
+        .play-square-inner {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, #4da3ff 0%, #1f6ed4 100%);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 0.95rem;
+            padding-left: 2px;
+        }
+
+        /* --- STESEN 2: MANDI BERSIH (Tengah Bawah) --- */
+        .stesen-2 {
+            left: 34.5%;
+            top: 33.5%;
+            width: 30%;
+        }
+
+        .s2-art {
+            width: 100%;
+            max-height: 185px;
+            object-fit: contain;
+            height: auto;
+            display: block;
+            margin-top: -4px;
+            cursor: pointer;
+            filter: drop-shadow(0 8px 12px rgba(0,0,0,0.22));
+            transition: transform 0.2s;
+            user-select: none;
+        }
+
+        .s2-art:hover {
+            transform: scale(1.04);
+        }
+
+        /* --- STESEN 3: BAJU WANGI (Kanan) --- */
+        .stesen-3 {
+            left: 66.8%;
+            top: 18%;
+            width: 30%;
+        }
+
+        .s3-art {
+            width: 100%;
+            max-height: 205px;
+            object-fit: contain;
+            height: auto;
+            display: block;
+            margin-top: -6px;
+            cursor: pointer;
+            filter: drop-shadow(0 8px 12px rgba(0,0,0,0.22));
+            transition: transform 0.2s;
+            user-select: none;
+        }
+
+        .s3-art:hover {
+            transform: scale(1.04);
+        }
+
+        /* Gelembung Kata Interaktif (SEGAR, WANGI, BERSIH, LEMBUT) */
+        .word-speech-btn {
+            position: absolute;
+            background: #ffffff;
+            color: #2b2b2b;
+            border: 2.5px solid #4a5568;
+            border-radius: 999px;
+            padding: 5px 14px;
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 700;
+            font-size: clamp(0.7rem, 1.15vw, 0.92rem);
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.16);
+            transition: transform 0.18s, background 0.18s;
+            z-index: 20;
+            animation: bobSpeech 2.8s ease-in-out infinite;
+        }
+
+        .word-speech-btn::after {
+            content: '';
+            position: absolute;
+            bottom: -7px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 7px 6px 0;
+            border-style: solid;
+            border-color: #ffffff transparent;
+            filter: drop-shadow(0 2px 0 #4a5568);
+        }
+
+        .word-speech-btn:hover {
+            transform: scale(1.14) !important;
+            background: #fff9c4;
+            border-color: var(--wood-dark);
+        }
+
+        @keyframes bobSpeech {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        /* ======================== KOTAK MISTERI [?] & MATAHARI DI LALUAN ======================== */
+        .road-item-btn {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            z-index: 18;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+            transition: transform 0.18s;
+        }
+
+        .road-item-btn:hover {
+            transform: translate(-50%, -58%) scale(1.15);
+        }
+
+        .q-block {
+            width: clamp(32px, 3.8vw, 44px);
+            height: clamp(32px, 3.8vw, 44px);
+            background: linear-gradient(180deg, #ffd449 0%, #f3a11b 100%);
+            border: 3px solid #784209;
+            border-radius: 9px;
+            box-shadow:
+                0 4px 0 #784209,
+                inset 0 2px 0 rgba(255, 255, 255, 0.75);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 700;
+            font-size: clamp(1.05rem, 1.6vw, 1.35rem);
+            color: #6b3700;
+            animation: qBounce 2.2s infinite ease-in-out;
+        }
+
+        @keyframes qBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
+        }
+
+        .sun-node {
+            width: clamp(36px, 4.4vw, 50px);
+            height: clamp(36px, 4.4vw, 50px);
+            filter: drop-shadow(0 4px 5px rgba(0,0,0,0.22));
+            animation: gentleSpin 12s linear infinite;
+        }
+
+        /* ======================== KARAKTER DOKTOR CILIK BERJALAN ======================== */
+        .character-actor {
+            position: absolute;
+            width: clamp(82px, 10.5vw, 122px);
+            height: clamp(112px, 14.2vw, 166px);
+            left: 9.5%;
+            top: 84%;
+            transform: translate(-50%, -88%);
+            z-index: 28;
+            cursor: pointer;
+            transition: filter 0.2s;
+            pointer-events: auto;
+        }
+
+        .character-actor:hover {
+            filter: drop-shadow(0 0 14px rgba(255, 255, 180, 0.98));
+        }
+
+        .char-flip-wrap {
+            width: 100%;
+            height: 100%;
+            transition: transform 0.22s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .character-actor.face-left .char-flip-wrap {
+            transform: scaleX(-1);
+        }
+
+        .char-sprite-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.28));
+            transform-origin: 50% 92%;
+        }
+
+        /* Animasi Ketika Doktor Cilik Berdiri (Idle) */
+        .character-actor:not(.walking):not(.arrived) .char-sprite-img {
+            animation: doctorIdle 2.2s infinite ease-in-out;
+        }
+
+        /* Animasi Ketika Doktor Cilik Sedang Berjalan */
+        .character-actor.walking .char-sprite-img {
+            animation: doctorWalkStride 0.32s infinite alternate ease-in-out;
+        }
+
+        /* Animasi Ketika Doktor Cilik Sampai di Stesen */
+        .character-actor.arrived .char-sprite-img {
+            animation: doctorArriveHop 0.45s ease-out 2;
+        }
+
+        @keyframes doctorIdle {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-5px) scale(1.02); }
+        }
+
+        @keyframes doctorWalkStride {
+            0% { transform: translateY(0) rotate(-7deg) scale(1.03, 0.96); }
+            50% { transform: translateY(-11px) rotate(0deg) scale(0.98, 1.04); }
+            100% { transform: translateY(0) rotate(7deg) scale(1.03, 0.96); }
+        }
+
+        @keyframes doctorArriveHop {
+            0%, 100% { transform: translateY(0) scale(1); }
+            45% { transform: translateY(-16px) scale(1.08); }
+        }
+
+        /* Kesan Tapak Kaki / Bintang Semasa Berjalan */
+        .step-puff {
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #fff9db 0%, #ffd43b 60%, transparent 100%);
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 16;
+            animation: puffFade 0.65s ease-out forwards;
+        }
+
+        @keyframes puffFade {
+            0% { opacity: 0.95; transform: translate(-50%, -50%) scale(0.6); }
+            100% { opacity: 0; transform: translate(-50%, -90%) scale(1.7); }
+        }
+
+        /* Penanda Tapak Perhentian Stesen di Atas Jalan */
+        .station-pad-btn {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            width: clamp(34px, 4vw, 46px);
+            height: clamp(20px, 2.4vw, 28px);
+            border-radius: 50%;
+            background: radial-gradient(circle, #fff3bf 0%, #fcc419 65%, #e67700 100%);
+            border: 2.5px solid #fff;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+            z-index: 14;
+            cursor: pointer;
+            padding: 0;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .station-pad-btn:hover,
+        .station-pad-btn.target-active {
+            transform: translate(-50%, -50%) scale(1.3);
+            box-shadow: 0 0 18px #fff3bf, 0 0 28px #fcc419;
+        }
+
+        .char-bubble {
+            position: absolute;
+            top: -32px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #ffffff;
+            color: var(--wood-dark);
+            border: 2.5px solid var(--wood-dark);
+            border-radius: 14px;
+            padding: 4px 11px;
+            font-family: 'Fredoka', sans-serif;
+            font-size: clamp(0.68rem, 1.05vw, 0.85rem);
+            font-weight: 700;
+            white-space: nowrap;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.22);
+            pointer-events: none;
+            transition: opacity 0.2s, transform 0.2s;
+        }
+
+        .char-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 6px 5px 0;
+            border-style: solid;
+            border-color: var(--wood-dark) transparent;
+        }
+
+        /* ======================== PANEL KAWALAN JALAN & STESEN ======================== */
+        .control-dock {
+            margin-top: 12px;
+            background: linear-gradient(180deg, var(--wood-light) 0%, #eac98b 100%);
+            border: 4px solid var(--wood-dark);
+            border-radius: 20px;
+            padding: 12px 16px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            box-shadow: 0 8px 20px rgba(34, 68, 14, 0.3);
+        }
+
+        .walk-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .station-quick-btns {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .ctrl-btn {
+            border: 3px solid var(--wood-dark);
+            border-radius: 13px;
+            padding: 9px 15px;
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 700;
+            font-size: 0.92rem;
+            cursor: pointer;
+            box-shadow: 0 4px 0 rgba(70, 40, 10, 0.35);
+            transition: transform 0.14s, filter 0.14s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .ctrl-btn:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.07);
+        }
+
+        .ctrl-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 rgba(70, 40, 10, 0.35);
+        }
+
+        .btn-walk {
+            background: linear-gradient(180deg, #fff8e6 0%, #f2d59b 100%);
+            color: var(--wood-dark);
+        }
+
+        .btn-enter {
+            background: linear-gradient(180deg, #6ee048 0%, #44a822 100%);
+            color: #fff;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+
+        /* Toast Info Pop-up di Atas Peta */
+        .map-toast {
+            position: absolute;
+            bottom: 14px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: rgba(255, 252, 235, 0.96);
+            border: 3px solid var(--wood-dark);
+            border-radius: 999px;
+            padding: 8px 22px;
+            font-family: 'Fredoka', sans-serif;
+            font-size: clamp(0.82rem, 1.3vw, 1.02rem);
+            font-weight: 700;
+            color: var(--wood-dark);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.28);
+            z-index: 35;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s, transform 0.25s;
+            white-space: nowrap;
+        }
+
+        .map-toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* ======================== MODAL AKTIVITI STESEN & MENU ======================== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(24, 52, 12, 0.72);
+            backdrop-filter: blur(4px);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            overflow-y: auto;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .activity-card {
+            background: var(--wood-cream);
+            border: 6px solid var(--wood-dark);
+            border-radius: 26px;
+            max-width: 880px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 24px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.45);
+            animation: modalPop 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+            text-align: left;
+        }
+
+        @keyframes modalPop {
+            from { opacity: 0; transform: scale(0.92); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .modal-header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding-bottom: 14px;
+            margin-bottom: 18px;
+            border-bottom: 3px dashed #dcc292;
+        }
+
+        .modal-title-badge {
+            font-family: 'Fredoka', sans-serif;
+            font-size: clamp(1.15rem, 2.2vw, 1.5rem);
+            color: #fff;
+            padding: 8px 20px;
+            border-radius: 14px;
+            border: 3px solid var(--wood-dark);
+            margin: 0;
+            box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+        }
+
+        /* Grid 5 Deria & Drag-Drop */
+        .sense-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(235px, 1fr));
+            gap: 14px;
+        }
+
+        .sense-card {
+            background: #ffffff;
+            border: 3px solid var(--wood-mid);
+            border-radius: 16px;
+            padding: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.07);
+        }
+
+        .sense-card h3 {
+            font-family: 'Fredoka', sans-serif;
+            margin-top: 0;
+            color: var(--wood-dark);
+            border-bottom: 2px dashed #eee0c4;
+            padding-bottom: 7px;
+        }
+
+        .tag-word {
+            display: inline-block;
+            background: #e1f5fe;
+            border: 2px solid #2f80ed;
+            color: #0d47a1;
+            padding: 4px 11px;
+            border-radius: 999px;
+            margin: 3px;
+            font-weight: 800;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .word-bank {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            padding: 16px;
+            background: linear-gradient(135deg, #dff3ff 0%, #f2fbff 100%);
+            border: 3px solid var(--stesen1-blue);
+            border-radius: 16px;
+            min-height: 70px;
+            margin-bottom: 18px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .draggable {
+            background: radial-gradient(circle at 30% 25%, #ffffff 0%, #bfe8ff 58%, #7ec4fc 100%);
+            color: #0b3c78;
+            border: 2.5px solid #1d68c4;
+            padding: 9px 18px;
+            border-radius: 999px;
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 700;
+            cursor: grab;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            transition: transform 0.15s;
+        }
+
+        .draggable.selected {
+            outline: 4px solid var(--gold);
+            transform: scale(1.08);
+        }
+
+        .drop-box {
+            min-height: 82px;
+            border: 3px dashed #7aa8d6;
+            border-radius: 12px;
+            padding: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+            justify-content: center;
+            background: #f6fbff;
+            margin-top: 8px;
+        }
+
+        .q-card {
+            background: #fff;
+            border: 3px solid #80c9ed;
+            border-radius: 16px;
+            padding: 15px 18px;
+            margin-bottom: 12px;
+        }
+
+        .radio-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: #f0f9ff;
+            border: 2px solid #b3e0f7;
+            border-radius: 11px;
+            padding: 8px 14px;
+            margin: 5px 8px 4px 0;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .radio-pill:hover {
+            background: #d9f0fc;
+        }
+
+        .baju-select, input[type="text"] {
+            width: 100%;
+            padding: 11px 14px;
+            margin-top: 8px;
+            border-radius: 11px;
+            border: 2.5px solid #c9a76c;
+            font-family: 'Nunito', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            background: #fff;
+        }
+
+        .feedback-box {
+            font-weight: 800;
+            margin-top: 14px;
+            padding: 13px 16px;
+            border-radius: 12px;
+        }
+
+        /* Animasi Rama-rama & Awan Wangi */
+        .flutter {
+            animation: butterflyMove 4s ease-in-out infinite alternate;
+        }
+
+        @keyframes butterflyMove {
+            0% { transform: translate(0, 0) rotate(-6deg); }
+            100% { transform: translate(8px, -10px) rotate(8deg); }
+        }
+
+        @media (max-width: 780px) {
+            .game-stage { min-height: 460px; }
+            .control-dock { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-shell">
+    <!-- ======================== PENTAS PETA PERMAINAN ======================== -->
+    <div id="game-stage" class="game-stage">
+
+        <!-- BAR ATAS (HUD): SKOR, PROGRESS BAR MATAHARI, BUNYI & MENU -->
+        <div class="hud-top">
+            <button class="hud-score-btn" onclick="openModal('modal-skor')" title="Lihat Rekod Skor & Pencapaian">
+                <span class="coin-badge">★</span>
+                <span>SKOR: <span id="skor-val">0</span></span>
+            </button>
+
+            <div class="hud-progress-wrap" onclick="walkToCheckpoint('sun1')" title="Kemajuan Kembara Kebersihan">
+                <!-- Ikon Matahari Tersenyum SVG -->
+                <svg class="sun-hud-icon" viewBox="0 0 80 80">
+                    <g stroke="#784209" stroke-width="3" stroke-linejoin="round">
+                        <!-- Sinaran matahari -->
+                        <polygon points="40,3 46,15 34,15" fill="#ffae19"/>
+                        <polygon points="40,77 46,65 34,65" fill="#ffae19"/>
+                        <polygon points="3,40 15,46 15,34" fill="#ffae19"/>
+                        <polygon points="77,40 65,46 65,34" fill="#ffae19"/>
+                        <polygon points="13,13 24,18 18,24" fill="#ffae19"/>
+                        <polygon points="67,13 56,18 62,24" fill="#ffae19"/>
+                        <polygon points="13,67 24,62 18,56" fill="#ffae19"/>
+                        <polygon points="67,67 56,62 62,56" fill="#ffae19"/>
+                        <circle cx="40" cy="40" r="22" fill="#ffd23f"/>
+                    </g>
+                    <circle cx="33" cy="36" r="2.6" fill="#5c3108"/>
+                    <circle cx="47" cy="36" r="2.6" fill="#5c3108"/>
+                    <circle cx="29" cy="41" r="3" fill="#ff8566" opacity="0.65"/>
+                    <circle cx="51" cy="41" r="3" fill="#ff8566" opacity="0.65"/>
+                    <path d="M35 43 Q40 48 45 43" stroke="#5c3108" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+                </svg>
+                <div class="progress-shell">
+                    <div id="progress-fill" class="progress-fill"></div>
+                </div>
+            </div>
+
+            <div class="hud-right-group">
+                <button id="sound-btn" class="hud-wood-btn" onclick="toggleSound()" title="Hidup/Matikan Bunyi">🔊</button>
+                <button class="hud-wood-btn" onclick="openModal('modal-menu')">MENU</button>
+            </div>
+        </div>
+
+        <!-- LAPISAN SVG LATAR TAMAN, POKOK, BUNGA & LALUAN BERBENGKOK -->
+        <svg class="world-svg" viewBox="0 0 1000 560" preserveAspectRatio="none">
+            <defs>
+                <radialGradient id="bushGrad" cx="40%" cy="35%" r="65%">
+                    <stop offset="0%" stop-color="#68c13c"/>
+                    <stop offset="100%" stop-color="#39851c"/>
+                </radialGradient>
+                <linearGradient id="trunkGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#8c5828"/>
+                    <stop offset="100%" stop-color="#5e3714"/>
+                </linearGradient>
+            </defs>
+
+            <!-- Rumput Halus & Tekstur Taman -->
+            <g stroke="#4f9e28" stroke-width="2.5" stroke-linecap="round" opacity="0.7">
+                <path d="M120 75 l-4 -9 M125 75 l2 -11 M130 75 l5 -8"/>
+                <path d="M460 110 l-4 -9 M465 110 l2 -10 M470 110 l5 -8"/>
+                <path d="M620 260 l-4 -9 M625 260 l2 -10 M630 260 l5 -8"/>
+                <path d="M210 430 l-4 -9 M215 430 l2 -11 M220 430 l5 -8"/>
+                <path d="M580 520 l-4 -9 M585 520 l2 -10 M590 520 l5 -8"/>
+                <path d="M890 480 l-4 -9 M895 480 l2 -10"/>
+            </g>
+
+            <!-- ================= LALUAN JALAN BERBENGKOK (SANDY ROAD) ================= -->
+            <!-- Sempadan Luar Jalan -->
+            <path d="M 35 495
+                     C 175 495, 290 440, 282 340
+                     C 274 230, 295 100, 395 100
+                     C 485 100, 515 195, 525 245
+                     C 540 175, 615 68, 735 68
+                     C 848 68, 862 245, 835 375
+                     C 810 495, 735 518, 625 508
+                     C 510 498, 395 488, 320 450"
+                  fill="none" stroke="#c88d37" stroke-width="64" stroke-linecap="round" stroke-linejoin="round"/>
+
+            <!-- Isi Jalan Pasir Kuning -->
+            <path id="walk-path"
+                  d="M 35 495
+                     C 175 495, 290 440, 282 340
+                     C 274 230, 295 100, 395 100
+                     C 485 100, 515 195, 525 245
+                     C 540 175, 615 68, 735 68
+                     C 848 68, 862 245, 835 375
+                     C 810 495, 735 518, 625 508
+                     C 510 498, 395 488, 320 450"
+                  fill="none" stroke="#f6cf82" stroke-width="54" stroke-linecap="round" stroke-linejoin="round"/>
+
+            <!-- Garisan Putus-putus Tengah Jalan -->
+            <path d="M 35 495
+                     C 175 495, 290 440, 282 340
+                     C 274 230, 295 100, 395 100
+                     C 485 100, 515 195, 525 245
+                     C 540 175, 615 68, 735 68
+                     C 848 68, 862 245, 835 375
+                     C 810 495, 735 518, 625 508
+                     C 510 498, 395 488, 320 450"
+                  fill="none" stroke="#d99b3c" stroke-width="5" stroke-dasharray="16 14" stroke-linecap="round"/>
+
+            <!-- ================= POKOK, SEMAK & BUNGA HIASAN ================= -->
+            <!-- Pokok Kiri Atas -->
+            <g>
+                <rect x="22" y="135" width="22" height="65" rx="4" fill="url(#trunkGrad)" stroke="#42250b" stroke-width="2.5"/>
+                <circle cx="33" cy="115" r="34" fill="url(#bushGrad)" stroke="#2b6314" stroke-width="3"/>
+                <circle cx="14" cy="130" r="24" fill="url(#bushGrad)" stroke="#2b6314" stroke-width="3"/>
+                <circle cx="52" cy="130" r="24" fill="url(#bushGrad)" stroke="#2b6314" stroke-width="3"/>
+            </g>
+
+            <!-- Pokok Kiri Tengah -->
+            <g>
+                <rect x="10" y="370" width="20" height="68" rx="4" fill="url(#trunkGrad)" stroke="#42250b" stroke-width="2.5"/>
+                <circle cx="20" cy="345" r="36" fill="url(#bushGrad)" stroke="#2b6314" stroke-width="3"/>
+                <circle cx="42" cy="362" r="25" fill="url(#bushGrad)" stroke="#2b6314" stroke-width="3"/>
+            </g>
+
+            <!-- Pokok Atas Tengah-Kiri -->
+            <g>
+                <rect x="280" y="12" width="26" height="34" rx="4" fill="url(#trunkGrad)" stroke="#42250b" stroke-width="2.5"/>
+                <ellipse cx="293" cy="12" rx="46" ry="24" fill="url(#bushGrad)" stroke="#2b6314" stroke-width="3"/>
+            </g>
+
+            <!-- Pokok Pain Kanan Atas -->
+            <g>
+                <rect x="965" y="115" width="20" height="45" rx="3" fill="url(#trunkGrad)" stroke="#42250b" stroke-width="2.5"/>
+                <polygon points="975,20 935,75 1015,75" fill="#3a8c22" stroke="#245913" stroke-width="3" stroke-linejoin="round"/>
+                <polygon points="975,50 930,105 1020,105" fill="#4aa32e" stroke="#245913" stroke-width="3" stroke-linejoin="round"/>
+                <polygon points="975,80 925,130 1025,130" fill="#5cb83b" stroke="#245913" stroke-width="3" stroke-linejoin="round"/>
+            </g>
+
+            <!-- Pokok Kanan Bawah -->
+            <g>
+                <rect x="962" y="435" width="24" height="75" rx="4" fill="url(#trunkGrad)" stroke="#42250b" stroke-width="2.5"/>
+                <circle cx="974" cy="405" r="38" fill="url(#bushGrad)" stroke="#2b6314" stroke-width="3"/>
+                <circle cx="948" cy="425" r="26" fill="url(#bushGrad)" stroke="#2b6314" stroke-width="3"/>
+            </g>
+
+            <!-- Semak Berbunga Bawah -->
+            <g>
+                <ellipse cx="330" cy="548" rx="68" ry="32" fill="#3b871e" stroke="#235710" stroke-width="3"/>
+                <ellipse cx="205" cy="555" rx="48" ry="22" fill="#4ea32c" stroke="#235710" stroke-width="3"/>
+                <ellipse cx="920" cy="548" rx="65" ry="30" fill="#3b871e" stroke="#235710" stroke-width="3"/>
+                <ellipse cx="835" cy="42" rx="28" ry="15" fill="#4ea32c" stroke="#235710" stroke-width="2.5"/>
+            </g>
+
+            <!-- Bunga-bunga Kecil & Rama-rama -->
+            <g>
+                <!-- Bunga Merah Jambu Tengah -->
+                <circle cx="392" cy="182" r="9" fill="#ff6b8b" stroke="#7a1c30" stroke-width="2"/>
+                <circle cx="392" cy="182" r="3.5" fill="#ffd93d"/>
+                <!-- Bunga Putih Kiri -->
+                <circle cx="32" cy="240" r="8" fill="#ffffff" stroke="#555" stroke-width="1.8"/>
+                <circle cx="32" cy="240" r="3" fill="#ffd93d"/>
+                <!-- Bunga Putih Laluan -->
+                <circle cx="212" cy="396" r="8" fill="#ffffff" stroke="#555" stroke-width="1.8"/>
+                <circle cx="212" cy="396" r="3" fill="#ffd93d"/>
+                <!-- Bunga Kanan Bawah -->
+                <circle cx="672" cy="442" r="9" fill="#ff6b8b" stroke="#7a1c30" stroke-width="2"/>
+                <circle cx="672" cy="442" r="3.5" fill="#ffd93d"/>
+                <circle cx="696" cy="450" r="8" fill="#c77dff" stroke="#4a154b" stroke-width="2"/>
+                <circle cx="696" cy="450" r="3" fill="#ffd93d"/>
+            </g>
+
+            <!-- Rama-rama Berterbangan -->
+            <g class="flutter" transform="translate(505, 88)">
+                <ellipse cx="-7" cy="-4" rx="8" ry="6" fill="#ff70a6" stroke="#5c1632" stroke-width="2"/>
+                <ellipse cx="7" cy="-4" rx="8" ry="6" fill="#ff70a6" stroke="#5c1632" stroke-width="2"/>
+                <ellipse cx="-5" cy="4" rx="6" ry="5" fill="#ff9770" stroke="#5c1632" stroke-width="2"/>
+                <ellipse cx="5" cy="4" rx="6" ry="5" fill="#ff9770" stroke="#5c1632" stroke-width="2"/>
+                <rect x="-1.5" y="-8" width="3" height="14" rx="1.5" fill="#3d1e05"/>
+            </g>
+            <g class="flutter" transform="translate(318, 378)">
+                <ellipse cx="-6" cy="-3" rx="7" ry="5" fill="#d070ff" stroke="#42125c" stroke-width="2"/>
+                <ellipse cx="6" cy="-3" rx="7" ry="5" fill="#d070ff" stroke="#42125c" stroke-width="2"/>
+                <rect x="-1.5" y="-7" width="3" height="12" rx="1.5" fill="#3d1e05"/>
+            </g>
+        </svg>
+
+        <!-- ======================== STESEN 1: GIGI SIHAT (GAMBAR ASAL STESEN 1) ======================== -->
+        <div class="station-node stesen-1">
+            <!-- Papan Tanda Kayu Berbunga: STESEN 1: GIGI SIHAT (Daripada Gambar Stesen 1) -->
+            <img src="s1_sign.png" alt="Stesen 1: Gigi Sihat" class="wood-sign-svg" onclick="goToStation('stesen1')" draggable="false">
+
+            <!-- Ilustrasi Asal: Karakter Berus Gigi, Senyuman Gigi Berkilat & Karakter Ubat Gigi -->
+            <img src="s1_art.png" alt="Ilustrasi Gigi Sihat" class="s1-art" onclick="goToStation('stesen1')" draggable="false">
+
+            <!-- Bar 5 Buih Interaktif + Butang [▶] Play -->
+            <div class="s1-bubble-row">
+                <button class="mini-bubble-btn" onclick="previewBubbleWord('Bersih', 'Deria Penglihatan (Mata) 👀')" title="Klik: Bersih">💧</button>
+                <button class="mini-bubble-btn" onclick="previewBubbleWord('Segar', 'Deria Rasa (Lidah) 👅')" title="Klik: Segar">🦷</button>
+                <button class="mini-bubble-btn" onclick="previewBubbleWord('Berkilat', 'Deria Penglihatan (Mata) 👀')" title="Klik: Berkilat">✨</button>
+                <button class="mini-bubble-btn" onclick="previewBubbleWord('Wangi', 'Deria Bau (Hidung) 👃')" title="Klik: Wangi">🌸</button>
+                <button class="mini-bubble-btn" onclick="previewBubbleWord('Licin', 'Deria Sentuhan (Tangan) 🖐️')" title="Klik: Licin">🫧</button>
+                <button class="play-square-btn" onclick="goToStation('stesen1')" title="Main Stesen 1: Gigi Sihat">
+                    <span class="play-square-inner">▶</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- ======================== STESEN 2: MANDI BERSIH (GAMBAR ASAL STESEN 2) ======================== -->
+        <div class="station-node stesen-2">
+            <!-- Papan Tanda Kayu Berbunga: STESEN 2: MANDI BERSIH (Daripada Gambar Stesen 2) -->
+            <img src="s2_sign.png" alt="Stesen 2: Mandi Bersih" class="wood-sign-svg" onclick="goToStation('stesen2')" draggable="false">
+
+            <!-- Butang Gelembung Kata "SEGAR" & "WANGI" -->
+            <button class="word-speech-btn" style="left: -4%; top: 38%;" onclick="speakAndToast('Segar! Badan berasa segar selepas mandi.', 'stesen2')">
+                SEGAR
+            </button>
+            <button class="word-speech-btn" style="right: -4%; top: 40%;" onclick="speakAndToast('Wangi! Sabun mandi berbau sangat wangi.', 'stesen2')">
+                WANGI
+            </button>
+
+            <!-- Ilustrasi Asal: Tab Mandi Berkaki, Buih Melimpah, Itik Kuning & 2 Botol Sabun -->
+            <img src="s2_art.png" alt="Ilustrasi Mandi Bersih" class="s2-art" onclick="goToStation('stesen2')" draggable="false">
+        </div>
+
+        <!-- ======================== STESEN 3: BAJU WANGI (GAMBAR ASAL STESEN 3) ======================== -->
+        <div class="station-node stesen-3">
+            <!-- Papan Tanda Kayu Berbuih & Berbunga: STESEN 3: BAJU WANGI (Daripada Gambar Stesen 3) -->
+            <img src="s3_sign.png" alt="Stesen 3: Baju Wangi" class="wood-sign-svg" onclick="goToStation('stesen3')" draggable="false">
+
+            <!-- Butang Gelembung Kata "BERSIH" & "LEMBUT" -->
+            <button class="word-speech-btn" style="left: -4%; top: 30%;" onclick="speakAndToast('Bersih! Baju yang dijemur kelihatan sangat bersih.', 'stesen3')">
+                BERSIH
+            </button>
+            <button class="word-speech-btn" style="right: -2%; top: 28%;" onclick="speakAndToast('Lembut! Lipatan kain berasa sangat lembut.', 'stesen3')">
+                LEMBUT
+            </button>
+
+            <!-- Ilustrasi Asal: Ampaian 5 Pakaian, Meja 4 Lipatan Kain, Botol Pelembut & Bakul Dobi -->
+            <img src="s3_art.png" alt="Ilustrasi Baju Wangi" class="s3-art" onclick="goToStation('stesen3')" draggable="false">
+        </div>
+
+        <!-- ======================== KOTAK MISTERI [?] & MATAHARI DI LALUAN ======================== -->
+        <!-- Matahari 1 (Kiri Bawah Jalan) -->
+        <button class="road-item-btn" style="left: 26.8%; top: 71.5%;" onclick="walkToCheckpoint('sun1')" title="Matahari Ceria 1: Tip Doktor">
+            <svg class="sun-node" viewBox="0 0 60 60">
+                <circle cx="30" cy="30" r="22" fill="#ffd43b" stroke="#8c5209" stroke-width="3" stroke-dasharray="6 3"/>
+                <circle cx="30" cy="30" r="16" fill="#ffe066" stroke="#8c5209" stroke-width="2.2"/>
+                <circle cx="25" cy="27" r="2" fill="#5c3108"/>
+                <circle cx="35" cy="27" r="2" fill="#5c3108"/>
+                <path d="M26 33 Q30 37 34 33" stroke="#5c3108" stroke-width="2" fill="none" stroke-linecap="round"/>
+            </svg>
+        </button>
+
+        <!-- Kotak Misteri [?] 1 (Nota 5 Deria) -->
+        <button class="road-item-btn" style="left: 38.0%; top: 17.5%;" onclick="walkToCheckpoint('q1')" title="Kotak [?] 1: Nota 5 Deria">
+            <div class="q-block">?</div>
+        </button>
+
+        <!-- Matahari 2 (Kanan Atas Jalan) -->
+        <button class="road-item-btn" style="left: 70.0%; top: 12.2%;" onclick="walkToCheckpoint('sun2')" title="Matahari Ceria 2: Bonus Bintang">
+            <svg class="sun-node" viewBox="0 0 60 60">
+                <circle cx="30" cy="30" r="22" fill="#ffd43b" stroke="#8c5209" stroke-width="3" stroke-dasharray="6 3"/>
+                <circle cx="30" cy="30" r="16" fill="#ffe066" stroke="#8c5209" stroke-width="2.2"/>
+                <circle cx="25" cy="27" r="2" fill="#5c3108"/>
+                <circle cx="35" cy="27" r="2" fill="#5c3108"/>
+                <path d="M26 33 Q30 37 34 33" stroke="#5c3108" stroke-width="2" fill="none" stroke-linecap="round"/>
+            </svg>
+        </button>
+
+        <!-- Kotak Misteri [?] 2 (Kuiz Kilat) -->
+        <button class="road-item-btn" style="left: 77.2%; top: 12.6%;" onclick="walkToCheckpoint('q2')" title="Kotak [?] 2: Kuiz Kilat">
+            <div class="q-block">?</div>
+        </button>
+
+        <!-- Kotak Misteri [?] 3 (Misi Bina Ayat) -->
+        <button class="road-item-btn" style="left: 72.2%; top: 91.5%;" onclick="walkToCheckpoint('q3')" title="Kotak [?] 3: Bina Ayat">
+            <div class="q-block">?</div>
+        </button>
+
+        <!-- Tapak Perhentian Stesen 1, 2 & 3 di Atas Laluan -->
+        <button id="pad-stesen1" class="station-pad-btn" style="left: 28.2%; top: 55.5%;" onclick="goToStation('stesen1')" title="Tapak Stesen 1: Gigi Sihat"></button>
+        <button id="pad-stesen2" class="station-pad-btn" style="left: 49.5%; top: 31.5%;" onclick="goToStation('stesen2')" title="Tapak Stesen 2: Mandi Bersih"></button>
+        <button id="pad-stesen3" class="station-pad-btn" style="left: 82.5%; top: 75.5%;" onclick="goToStation('stesen3')" title="Tapak Stesen 3: Baju Wangi"></button>
+
+        <!-- ======================== KARAKTER DOKTOR CILIK (BOLEH BERJALAN KE SETIAP STESEN) ======================== -->
+        <div id="doctor-char" class="character-actor" onclick="openCurrentCheckpoint()" title="Klik Doktor Cilik!">
+            <div id="char-speech" class="char-bubble">Klik stesen untuk jalan! 🚶‍♂️</div>
+            <div class="char-flip-wrap">
+                <img src="doktor.png" alt="Doktor Cilik" class="char-sprite-img" draggable="false">
+            </div>
+        </div>
+
+        <!-- Toast Mesej Interaktif -->
+        <div id="map-toast" class="map-toast">Selamat datang ke Kembara Kebersihan!</div>
+    </div>
+
+    <!-- ======================== BAR KAWALAN BERJALAN & BUTANG PANTAS ======================== -->
+    <div class="control-dock">
+        <div class="walk-controls">
+            <button class="ctrl-btn btn-walk" onclick="stepStation(-1)">⬅ Jalan Undur</button>
+            <button class="ctrl-btn btn-walk" onclick="stepStation(1)">Jalan Maju ➡</button>
+            <button class="ctrl-btn btn-enter" onclick="openCurrentCheckpoint()">🎯 Buka Stesen Semasa</button>
+        </div>
+
+        <div class="station-quick-btns">
+            <button class="ctrl-btn ribbon-blue" style="color:#fff;" onclick="goToStation('stesen1')">🪥 Stesen 1</button>
+            <button class="ctrl-btn ribbon-cyan" onclick="goToStation('stesen2')">🛁 Stesen 2</button>
+            <button class="ctrl-btn ribbon-pink" style="color:#fff;" onclick="goToStation('stesen3')">👕 Stesen 3</button>
+            <button class="ctrl-btn btn-walk" onclick="walkToCheckpoint('q1')">📘 Nota 5 Deria</button>
+            <button class="ctrl-btn btn-walk" onclick="walkToCheckpoint('q3')">✍️ Bina Ayat</button>
+        </div>
+    </div>
+</div>
+
+<!-- ======================== MODAL 1: NOTA 5 DERIA (KOTAK [?] 1) ======================== -->
+<div id="modal-nota" class="modal-overlay" onclick="if(event.target===this) closeModal('modal-nota')">
+    <div class="activity-card">
+        <div class="modal-header">
+            <h2 class="modal-title-badge" style="background:#43a047;">🩺 Nota Doktor Cilik: 5 Deria Pancaindera</h2>
+            <button class="ctrl-btn btn-walk" onclick="closeModal('modal-nota')">✖ Tutup & Kembali ke Peta</button>
+        </div>
+        <p><strong>Kata adjektif pancaindera</strong> menerangkan sifat yang dapat dikesan melalui <strong>5 deria manusia</strong>. Klik perkataan untuk mendengar sebutannya:</p>
+        <div class="sense-grid">
+            <div class="sense-card">
+                <h3>👀 1. Deria Penglihatan (Mata)</h3>
+                <p>
+                    <span class="tag-word" onclick="speakWord('Bersih')">🔊 Bersih</span>
+                    <span class="tag-word" onclick="speakWord('Berkilat')">🔊 Berkilat</span>
+                    <span class="tag-word" onclick="speakWord('Kemas')">🔊 Kemas</span>
+                    <span class="tag-word" onclick="speakWord('Kotor')">🔊 Kotor</span>
+                </p>
+                <p><em>Contoh:</em> Gigi adik kelihatan <strong>bersih</strong> dan <strong>berkilat</strong>.</p>
+            </div>
+            <div class="sense-card">
+                <h3>👃 2. Deria Bau (Hidung)</h3>
+                <p>
+                    <span class="tag-word" onclick="speakWord('Wangi')">🔊 Wangi</span>
+                    <span class="tag-word" onclick="speakWord('Harum')">🔊 Harum</span>
+                    <span class="tag-word" onclick="speakWord('Busuk')">🔊 Busuk</span>
+                    <span class="tag-word" onclick="speakWord('Hapak')">🔊 Hapak</span>
+                </p>
+                <p><em>Contoh:</em> Sabun di dalam tab mandi itu berbau <strong>wangi</strong>.</p>
+            </div>
+            <div class="sense-card">
+                <h3>🖐️ 3. Deria Sentuhan (Tangan)</h3>
+                <p>
+                    <span class="tag-word" onclick="speakWord('Lembut')">🔊 Lembut</span>
+                    <span class="tag-word" onclick="speakWord('Licin')">🔊 Licin</span>
+                    <span class="tag-word" onclick="speakWord('Kasar')">🔊 Kasar</span>
+                    <span class="tag-word" onclick="speakWord('Kering')">🔊 Kering</span>
+                </p>
+                <p><em>Contoh:</em> Baju yang telah dicuci itu berasa sangat <strong>lembut</strong>.</p>
+            </div>
+            <div class="sense-card">
+                <h3>👅👂 4 & 5. Rasa & Pendengaran</h3>
+                <p>
+                    <span class="tag-word" onclick="speakWord('Segar')">🔊 Segar</span>
+                    <span class="tag-word" onclick="speakWord('Manis')">🔊 Manis</span>
+                    <span class="tag-word" onclick="speakWord('Senyap')">🔊 Senyap</span>
+                    <span class="tag-word" onclick="speakWord('Bising')">🔊 Bising</span>
+                </p>
+                <p><em>Contoh:</em> Ubat gigi pudina itu memberikan rasa <strong>segar</strong>.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ======================== MODAL 2: STESEN 1 - GIGI SIHAT ======================== -->
+<div id="modal-stesen1" class="modal-overlay" onclick="if(event.target===this) closeModal('modal-stesen1')">
+    <div class="activity-card">
+        <div class="modal-header">
+            <h2 class="modal-title-badge ribbon-blue">🪥 Stesen 1: Gigi Sihat — Kelaskan Deria!</h2>
+            <button class="ctrl-btn btn-walk" onclick="closeModal('modal-stesen1')">✖ Kembali ke Peta</button>
+        </div>
+
+        <!-- Pentas Visual Stesen 1 (stesen1.jpg) bersama Doktor Cilik & Hotspot Sebutan -->
+        <div class="station-scene-stage" style="background-image: url('stesen1.jpg');">
+            <img src="doktor.png" alt="Doktor Cilik di Stesen 1" class="scene-doctor-actor" style="left: 38%;">
+            <button class="scene-hotspot-pill" style="left: 48%; top: 18%;" onclick="speakWord('Bersih dan Berkilat!')">✨ Gigi Bersih & Berkilat (Mata)</button>
+            <button class="scene-hotspot-pill" style="right: 5%; bottom: 12%;" onclick="speakWord('Segar dan Wangi!')">🌿 Ubat Gigi Segar (Rasa/Bau)</button>
+        </div>
+
+        <p>Seret (atau klik) buih kata adjektif di bawah ke dalam kotak deria pancaindera yang betul:</p>
+
+        <div id="bank-deria" class="word-bank" ondragover="allow(event)" ondrop="dropSense(event)" onclick="tapBox(this)">
+            <div class="draggable" draggable="true" ondragstart="drag(event)" onclick="tapWord(event, this)" id="d1" data-sense="mata">Bersih</div>
+            <div class="draggable" draggable="true" ondragstart="drag(event)" onclick="tapWord(event, this)" id="d2" data-sense="hidung">Wangi</div>
+            <div class="draggable" draggable="true" ondragstart="drag(event)" onclick="tapWord(event, this)" id="d3" data-sense="tangan">Licin</div>
+            <div class="draggable" draggable="true" ondragstart="drag(event)" onclick="tapWord(event, this)" id="d4" data-sense="mata">Berkilat</div>
+            <div class="draggable" draggable="true" ondragstart="drag(event)" onclick="tapWord(event, this)" id="d5" data-sense="hidung">Busuk</div>
+            <div class="draggable" draggable="true" ondragstart="drag(event)" onclick="tapWord(event, this)" id="d6" data-sense="tangan">Lembut</div>
+        </div>
+
+        <div class="sense-grid">
+            <div class="sense-card">
+                <h3>👀 Deria Penglihatan (Mata)</h3>
+                <div class="drop-box" data-sense="mata" ondragover="allow(event)" ondrop="dropSense(event)" onclick="tapBox(this)"></div>
+            </div>
+            <div class="sense-card">
+                <h3>👃 Deria Bau (Hidung)</h3>
+                <div class="drop-box" data-sense="hidung" ondragover="allow(event)" ondrop="dropSense(event)" onclick="tapBox(this)"></div>
+            </div>
+            <div class="sense-card">
+                <h3>🖐️ Deria Sentuhan (Tangan)</h3>
+                <div class="drop-box" data-sense="tangan" ondragover="allow(event)" ondrop="dropSense(event)" onclick="tapBox(this)"></div>
+            </div>
+        </div>
+
+        <div style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="ctrl-btn btn-enter" onclick="semakStesen1()">✔ Semak Jawapan Stesen 1</button>
+            <button class="ctrl-btn btn-walk" onclick="closeModal('modal-stesen1'); goToStation('stesen2')">Terus Jalan ke Stesen 2 ➡</button>
+        </div>
+        <div id="fb-stesen1" class="feedback-box"></div>
+    </div>
+</div>
+
+<!-- ======================== MODAL 3: STESEN 2 - MANDI BERSIH ======================== -->
+<div id="modal-stesen2" class="modal-overlay" onclick="if(event.target===this) closeModal('modal-stesen2')">
+    <div class="activity-card">
+        <div class="modal-header">
+            <h2 class="modal-title-badge ribbon-cyan">🛁 Stesen 2: Mandi Bersih — Siasat Situasi!</h2>
+            <button class="ctrl-btn btn-walk" onclick="closeModal('modal-stesen2')">✖ Kembali ke Peta</button>
+        </div>
+
+        <!-- Pentas Visual Stesen 2 (stesen2.jpg) bersama Doktor Cilik & Hotspot Sebutan -->
+        <div class="station-scene-stage" style="background-image: url('stesen2.jpg');">
+            <img src="doktor.png" alt="Doktor Cilik di Stesen 2" class="scene-doctor-actor" style="left: 62%;">
+            <button class="scene-hotspot-pill" style="left: 16%; top: 36%;" onclick="speakWord('Segar! Air dan buih mandi sangat segar.')">🛁 Buih Segar & Bersih</button>
+            <button class="scene-hotspot-pill" style="left: 8%; bottom: 8%;" onclick="speakWord('Wangi dan Licin! Sabun mandi berbau wangi.')">🧴 Sabun Wangi & Licin</button>
+        </div>
+
+        <div class="q-card">
+            <p><strong>1. Selepas mandi dengan sabun bunga, badan adik berasa ______ dan berbau ______.</strong></p>
+            <label class="radio-pill"><input type="radio" name="g1" value="segar_wangi"> A. Segar dan wangi</label>
+            <label class="radio-pill"><input type="radio" name="g1" value="busuk_kasar"> B. Busuk dan kasar</label>
+            <label class="radio-pill"><input type="radio" name="g1" value="bising_kotor"> C. Bising dan kotor</label>
+        </div>
+
+        <div class="q-card">
+            <p><strong>2. Ibu menasihati adik supaya berhati-hati kerana lantai bilik air yang bersabun itu ______. (Deria Sentuhan)</strong></p>
+            <label class="radio-pill"><input type="radio" name="g2" value="wangi"> A. Wangi</label>
+            <label class="radio-pill"><input type="radio" name="g2" value="licin"> B. Licin</label>
+            <label class="radio-pill"><input type="radio" name="g2" value="busuk"> C. Busuk</label>
+        </div>
+
+        <div class="q-card">
+            <p><strong>3. Alia menutup hidungnya apabila lalu di tepi tong sampah itu kerana berbau ______. (Deria Bau)</strong></p>
+            <label class="radio-pill"><input type="radio" name="g3" value="busuk"> A. Busuk</label>
+            <label class="radio-pill"><input type="radio" name="g3" value="lembut"> B. Lembut</label>
+            <label class="radio-pill"><input type="radio" name="g3" value="berkilat"> C. Berkilat</label>
+        </div>
+
+        <div style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="ctrl-btn btn-enter" onclick="semakStesen2()">✔ Semak Jawapan Stesen 2</button>
+            <button class="ctrl-btn btn-walk" onclick="closeModal('modal-stesen2'); goToStation('stesen3')">Terus Jalan ke Stesen 3 ➡</button>
+        </div>
+        <div id="fb-stesen2" class="feedback-box"></div>
+    </div>
+</div>
+
+<!-- ======================== MODAL 4: STESEN 3 - BAJU WANGI ======================== -->
+<div id="modal-stesen3" class="modal-overlay" onclick="if(event.target===this) closeModal('modal-stesen3')">
+    <div class="activity-card">
+        <div class="modal-header">
+            <h2 class="modal-title-badge ribbon-pink">👕 Stesen 3: Baju Wangi — Lengkapkan Kata Adjektif!</h2>
+            <button class="ctrl-btn btn-walk" onclick="closeModal('modal-stesen3')">✖ Kembali ke Peta</button>
+        </div>
+
+        <!-- Pentas Visual Stesen 3 (stesen3.jpg) bersama Doktor Cilik & Hotspot Sebutan -->
+        <div class="station-scene-stage" style="background-image: url('stesen3.jpg');">
+            <img src="doktor.png" alt="Doktor Cilik di Stesen 3" class="scene-doctor-actor" style="left: 22%;">
+            <button class="scene-hotspot-pill" style="right: 16%; top: 18%;" onclick="speakWord('Bersih! Baju di ampaian kelihatan sangat bersih.')">👕 Baju Bersih (Mata)</button>
+            <button class="scene-hotspot-pill" style="right: 8%; bottom: 14%;" onclick="speakWord('Lembut dan Wangi! Pakaian berasa lembut dan berbau wangi.')">🌸 Kain Lembut & Wangi</button>
+        </div>
+
+        <div class="sense-grid">
+            <div class="sense-card">
+                <h3>🧥 1. Baju di Ampaian</h3>
+                <p>Baju hijau dan stoking yang dijemur itu kelihatan sangat ______ tanpa kotoran.</p>
+                <select id="baju1" class="baju-select">
+                    <option value="">-- Pilih Jawapan --</option>
+                    <option value="bersih">Bersih</option>
+                    <option value="bising">Bising</option>
+                    <option value="pahit">Pahit</option>
+                </select>
+            </div>
+
+            <div class="sense-card">
+                <h3>🧺 2. Lipatan Kain</h3>
+                <p>Pakaian yang dicuci dengan pelembut kain berasa sangat ______ apabila disentuh.</p>
+                <select id="baju2" class="baju-select">
+                    <option value="">-- Pilih Jawapan --</option>
+                    <option value="kasar">Kasar</option>
+                    <option value="lembut">Lembut</option>
+                    <option value="masin">Masin</option>
+                </select>
+            </div>
+
+            <div class="sense-card">
+                <h3>🌸 3. Haruman Pakaian</h3>
+                <p>Baju sekolah Amir berbau ______ seperti bunga selepas dibasuh oleh ibu.</p>
+                <select id="baju3" class="baju-select">
+                    <option value="">-- Pilih Jawapan --</option>
+                    <option value="hapak">Hapak</option>
+                    <option value="wangi">Wangi</option>
+                    <option value="licin">Licin</option>
+                </select>
+            </div>
+        </div>
+
+        <div style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="ctrl-btn btn-enter" onclick="semakStesen3()">✔ Semak Jawapan Stesen 3</button>
+            <button class="ctrl-btn btn-walk" onclick="closeModal('modal-stesen3'); walkToCheckpoint('q3')">Jalan ke Kotak [?] Bina Ayat ➡</button>
+        </div>
+        <div id="fb-stesen3" class="feedback-box"></div>
+    </div>
+</div>
+
+<!-- ======================== MODAL 5: KOTAK [?] 2 - KUIZ KILAT ======================== -->
+<div id="modal-kuiz" class="modal-overlay" onclick="if(event.target===this) closeModal('modal-kuiz')">
+    <div class="activity-card" style="max-width:620px;">
+        <div class="modal-header">
+            <h2 class="modal-title-badge" style="background:#f39c12;">❓ Kotak Misteri [?]: Kuiz Kilat Bonus!</h2>
+            <button class="ctrl-btn btn-walk" onclick="closeModal('modal-kuiz')">✖ Tutup</button>
+        </div>
+        <p><strong>Soalan Bonus (+20 Skor):</strong> Antara berikut, manakah pasangan <em>Kata Adjektif Pancaindera</em> dan <em>Deria</em> yang <strong>BETUL</strong>?</p>
+        <div class="q-card">
+            <label class="radio-pill"><input type="radio" name="kuiz_bonus" value="salah1"> A. Wangi — Deria Penglihatan (Mata)</label><br>
+            <label class="radio-pill"><input type="radio" name="kuiz_bonus" value="betul"> B. Lembut — Deria Sentuhan (Tangan)</label><br>
+            <label class="radio-pill"><input type="radio" name="kuiz_bonus" value="salah2"> C. Bersih — Deria Pendengaran (Telinga)</label>
+        </div>
+        <button class="ctrl-btn btn-enter" onclick="semakKuizKilat()">✔ Jawab Kuiz Bonus</button>
+        <div id="fb-kuiz" class="feedback-box"></div>
+    </div>
+</div>
+
+<!-- ======================== MODAL 6: KOTAK [?] 3 - BINA AYAT ======================== -->
+<div id="modal-ayat" class="modal-overlay" onclick="if(event.target===this) closeModal('modal-ayat')">
+    <div class="activity-card">
+        <div class="modal-header">
+            <h2 class="modal-title-badge" style="background:#e67e22;">✍️ Misi Kotak [?]: Bina Ayat Kebersihan!</h2>
+            <button class="ctrl-btn btn-walk" onclick="closeModal('modal-ayat')">✖ Kembali ke Peta</button>
+        </div>
+        <p>Bina tiga ayat lengkap berdasarkan kata adjektif pancaindera di bawah:</p>
+
+        <div class="q-card">
+            <label for="ay1"><strong>1. Bersih (Deria Penglihatan 👀):</strong></label>
+            <input type="text" id="ay1" placeholder="Contoh: Gigi adik sangat bersih selepas diberus.">
+        </div>
+        <div class="q-card">
+            <label for="ay2"><strong>2. Wangi / Segar (Deria Bau 👃 / Rasa):</strong></label>
+            <input type="text" id="ay2" placeholder="Contoh: Sabun mandi itu berbau sangat wangi.">
+        </div>
+        <div class="q-card">
+            <label for="ay3"><strong>3. Lembut / Licin (Deria Sentuhan 🖐️):</strong></label>
+            <input type="text" id="ay3" placeholder="Contoh: Baju yang baru dibasuh itu berasa lembut.">
+        </div>
+
+        <button class="ctrl-btn btn-enter" onclick="semakBinaAyat()">✔ Hantar Ayat (+30 Skor)</button>
+        <div id="fb-ayat" class="feedback-box"></div>
+    </div>
+</div>
+
+<!-- ======================== MODAL 7: MENU UTAMA & SKOR ======================== -->
+<div id="modal-menu" class="modal-overlay" onclick="if(event.target===this) closeModal('modal-menu')">
+    <div class="activity-card" style="max-width:480px; text-align:center;">
+        <div class="modal-header" style="justify-content:center;">
+            <h2 class="modal-title-badge" style="background:var(--wood-mid);">🗺️ Menu Kembara Kebersihan</h2>
+        </div>
+        <p>Pilih destinasi untuk Doktor Cilik berjalan:</p>
+        <div style="display:flex; flex-direction:column; gap:10px; margin:16px 0;">
+            <button class="ctrl-btn ribbon-blue" style="color:#fff; justify-content:center;" onclick="closeModal('modal-menu'); goToStation('stesen1')">🪥 Jalan ke Stesen 1: Gigi Sihat</button>
+            <button class="ctrl-btn ribbon-cyan" style="justify-content:center;" onclick="closeModal('modal-menu'); goToStation('stesen2')">🛁 Jalan ke Stesen 2: Mandi Bersih</button>
+            <button class="ctrl-btn ribbon-pink" style="color:#fff; justify-content:center;" onclick="closeModal('modal-menu'); goToStation('stesen3')">👕 Jalan ke Stesen 3: Baju Wangi</button>
+            <button class="ctrl-btn btn-walk" style="justify-content:center;" onclick="closeModal('modal-menu'); walkToCheckpoint('q1')">📘 Jalan ke Kotak [?] 1: Nota 5 Deria</button>
+            <button class="ctrl-btn btn-walk" style="justify-content:center;" onclick="closeModal('modal-menu'); walkToCheckpoint('q2')">⚡ Jalan ke Kotak [?] 2: Kuiz Kilat</button>
+            <button class="ctrl-btn btn-walk" style="justify-content:center;" onclick="closeModal('modal-menu'); walkToCheckpoint('q3')">✍️ Jalan ke Kotak [?] 3: Bina Ayat</button>
+            <button class="ctrl-btn btn-walk" style="justify-content:center; background:#ffd6d6;" onclick="resetGame()">🔄 Ulang Semula Permainan (Reset Skor)</button>
+        </div>
+        <button class="ctrl-btn btn-enter" onclick="closeModal('modal-menu')">Teruskan Permainan</button>
+    </div>
+</div>
+
+<!-- MODAL REKOD SKOR -->
+<div id="modal-skor" class="modal-overlay" onclick="if(event.target===this) closeModal('modal-skor')">
+    <div class="activity-card" style="max-width:460px; text-align:center;">
+        <div class="modal-header" style="justify-content:center;">
+            <h2 class="modal-title-badge" style="background:#d6850a;">🏆 Rekod Skor Kembara</h2>
+        </div>
+        <div id="skor-breakdown" style="text-align:left; font-weight:700; line-height:2; font-size:1.05rem;"></div>
+        <button class="ctrl-btn btn-enter" style="margin-top:16px;" onclick="closeModal('modal-skor')">Tutup</button>
+    </div>
+</div>
+
+<script>
+    // ======================== SISTEM BUNYI & SUARA (WEB AUDIO + SPEECH) ========================
+    let soundEnabled = true;
+    let audioCtx = null;
+
+    function getAudioCtx() {
+        if (!audioCtx) {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (AudioContext) audioCtx = new AudioContext();
+        }
+        if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+        return audioCtx;
+    }
+
+    function playTone(freq, duration = 0.1, type = 'sine', vol = 0.12) {
+        if (!soundEnabled) return;
+        const ctx = getAudioCtx();
+        if (!ctx) return;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+        gain.gain.setValueAtTime(vol, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + duration);
+    }
+
+    function playSuccessSound() {
+        playTone(523.25, 0.12, 'triangle', 0.16);
+        setTimeout(() => playTone(659.25, 0.12, 'triangle', 0.16), 110);
+        setTimeout(() => playTone(783.99, 0.25, 'triangle', 0.18), 220);
+    }
+
+    function toggleSound() {
+        soundEnabled = !soundEnabled;
+        document.getElementById('sound-btn').textContent = soundEnabled ? '🔊' : '🔇';
+        showToast(soundEnabled ? '🔊 Bunyi dihidupkan!' : '🔇 Bunyi dimatikan.');
+    }
+
+    function speakWord(text) {
+        playTone(640, 0.1, 'sine', 0.14);
+        if ('speechSynthesis' in window && soundEnabled) {
+            window.speechSynthesis.cancel();
+            const utter = new SpeechSynthesisUtterance(text);
+            utter.lang = 'ms-MY';
+            utter.rate = 0.95;
+            window.speechSynthesis.speak(utter);
+        }
+    }
+
+    function speakAndToast(text, stationKey) {
+        speakWord(text);
+        showToast('💬 ' + text);
+        setTimeout(() => goToStation(stationKey), 900);
+    }
+
+    function previewBubbleWord(word, deriaInfo) {
+        speakWord(word);
+        showToast(`🫧 Buih "${word}" — ${deriaInfo}`);
+    }
+
+    // ======================== SISTEM PERGERAKAN KARAKTER DI ATAS LALUAN ========================
+    const walkPath = document.getElementById('walk-path');
+    const doctorEl = document.getElementById('doctor-char');
+    const charSpeech = document.getElementById('char-speech');
+    const gameStage = document.getElementById('game-stage');
+
+    // Senarai titik perhentian (0.0 hingga 1.0 sepanjang SVG walk-path)
+    const checkpoints = {
+        start:   { t: 0.03, label: 'Titik Mula (Nota 5 Deria)', modal: 'modal-nota' },
+        sun1:    { t: 0.13, label: 'Matahari Ceria 1', bonus: 'sun1' },
+        stesen1: { t: 0.18, label: 'Stesen 1: Gigi Sihat', modal: 'modal-stesen1', padId: 'pad-stesen1' },
+        q1:      { t: 0.31, label: 'Kotak [?] 1: Nota 5 Deria', modal: 'modal-nota' },
+        stesen2: { t: 0.38, label: 'Stesen 2: Mandi Bersih', modal: 'modal-stesen2', padId: 'pad-stesen2' },
+        sun2:    { t: 0.59, label: 'Matahari Ceria 2', bonus: 'sun2' },
+        q2:      { t: 0.64, label: 'Kotak [?] 2: Kuiz Kilat', modal: 'modal-kuiz' },
+        stesen3: { t: 0.82, label: 'Stesen 3: Baju Wangi', modal: 'modal-stesen3', padId: 'pad-stesen3' },
+        q3:      { t: 0.89, label: 'Kotak [?] 3: Bina Ayat', modal: 'modal-ayat' }
+    };
+
+    const orderedKeys = ['start', 'sun1', 'stesen1', 'q1', 'stesen2', 'sun2', 'q2', 'stesen3', 'q3'];
+    let currentKey = 'start';
+    let currentT = checkpoints.start.t;
+    let animFrame = null;
+    let arriveTimer = null;
+
+    let lastX = null;
+    function positionCharacterAt(t) {
+        const totalLen = walkPath.getTotalLength();
+        const pt = walkPath.getPointAtLength(t * totalLen);
+        if (lastX !== null && Math.abs(pt.x - lastX) > 0.35) {
+            if (pt.x < lastX) {
+                doctorEl.classList.add('face-left');
+            } else {
+                doctorEl.classList.remove('face-left');
+            }
+        }
+        lastX = pt.x;
+        // Tukarkan koordinat SVG (1000 x 560) kepada peratusan pentas
+        const leftPct = (pt.x / 1000) * 100;
+        const topPct = (pt.y / 560) * 100;
+        doctorEl.style.left = leftPct + '%';
+        doctorEl.style.top = topPct + '%';
+        return { leftPct, topPct };
+    }
+
+    function spawnStepPuff(leftPct, topPct) {
+        const puff = document.createElement('div');
+        puff.className = 'step-puff';
+        puff.style.left = leftPct + '%';
+        puff.style.top = topPct + '%';
+        gameStage.appendChild(puff);
+        setTimeout(() => puff.remove(), 650);
+    }
+
+    // Letakkan Doktor Cilik & penanda tapak stesen tepat di atas laluan semasa mula
+    function syncStationPadsToPath() {
+        const totalLen = walkPath.getTotalLength();
+        Object.values(checkpoints).forEach(cp => {
+            if (cp.padId) {
+                const padEl = document.getElementById(cp.padId);
+                if (padEl) {
+                    const pt = walkPath.getPointAtLength(cp.t * totalLen);
+                    padEl.style.left = ((pt.x / 1000) * 100) + '%';
+                    padEl.style.top = ((pt.y / 560) * 100) + '%';
+                }
+            }
+        });
+    }
+    syncStationPadsToPath();
+    positionCharacterAt(currentT);
+
+    function walkCharacterTo(targetKey, onArrive) {
+        const targetObj = checkpoints[targetKey];
+        if (!targetObj) return;
+        const targetT = targetObj.t;
+
+        // Tutup sebarang modal supaya pergerakan karakter di atas peta kelihatan jelas
+        document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active'));
+
+        if (animFrame) cancelAnimationFrame(animFrame);
+        if (arriveTimer) clearTimeout(arriveTimer);
+
+        document.querySelectorAll('.station-pad-btn').forEach(b => b.classList.remove('target-active'));
+        if (targetObj.padId) {
+            const padEl = document.getElementById(targetObj.padId);
+            if (padEl) padEl.classList.add('target-active');
+        }
+
+        const distance = Math.abs(targetT - currentT);
+        if (distance < 0.005) {
+            currentKey = targetKey;
+            doctorEl.classList.remove('walking');
+            doctorEl.classList.add('arrived');
+            charSpeech.textContent = '📍 ' + targetObj.label;
+            if (onArrive) onArrive(false);
+            return;
+        }
+
+        doctorEl.classList.remove('arrived');
+        doctorEl.classList.add('walking');
+        charSpeech.textContent = '🚶‍♂️ Berjalan ke ' + targetObj.label + '...';
+
+        const startT = currentT;
+        const duration = Math.max(750, distance * 2500); // Masa berjalan mengikut jarak laluan
+        const startTime = performance.now();
+        let lastStepSound = 0;
+
+        function animateWalk(now) {
+            const elapsed = now - startTime;
+            const progress = Math.min(1, elapsed / duration);
+            // Smooth easeInOutQuad
+            const eased = progress < 0.5
+                ? 2 * progress * progress
+                : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+
+            currentT = startT + (targetT - startT) * eased;
+            const pos = positionCharacterAt(currentT);
+
+            if (now - lastStepSound > 160) {
+                playTone(320 + Math.random() * 90, 0.045, 'triangle', 0.07);
+                spawnStepPuff(pos.leftPct, pos.topPct);
+                lastStepSound = now;
+            }
+
+            if (progress < 1) {
+                animFrame = requestAnimationFrame(animateWalk);
+            } else {
+                currentT = targetT;
+                currentKey = targetKey;
+                doctorEl.classList.remove('walking');
+                doctorEl.classList.add('arrived');
+                charSpeech.textContent = '✅ Tiba di ' + targetObj.label + '!';
+                playSuccessSound();
+                if (onArrive) onArrive(true);
+            }
+        }
+
+        animFrame = requestAnimationFrame(animateWalk);
+    }
+
+    function goToStation(stationKey) {
+        walkCharacterTo(stationKey, (didWalk) => {
+            const cp = checkpoints[stationKey];
+            if (cp && cp.modal) {
+                // Beri masa supaya murid nampak Doktor Cilik tiba & melompat di stesen sebelum modal dibuka
+                const delay = didWalk ? 750 : 150;
+                arriveTimer = setTimeout(() => openModal(cp.modal), delay);
+            }
+        });
+    }
+
+    function walkToCheckpoint(key, autoOpenModal = true) {
+        walkCharacterTo(key, (didWalk) => {
+            const cp = checkpoints[key];
+            if (cp.bonus === 'sun1') {
+                scores.sun1 = 5;
+                updateScoreBoard();
+                showToast('☀️ Matahari Ceria 1: Gosok gigi 2 kali sehari supaya bersih & berkilat! (+5 Skor)');
+            } else if (cp.bonus === 'sun2') {
+                scores.sun2 = 5;
+                updateScoreBoard();
+                showToast('☀️ Matahari Ceria 2: Pakai pakaian yang bersih, lembut & wangi setiap hari! (+5 Skor)');
+            } else if (cp.modal && autoOpenModal) {
+                const delay = didWalk ? 750 : 150;
+                arriveTimer = setTimeout(() => openModal(cp.modal), delay);
+            } else if (cp.modal) {
+                showToast('📍 Doktor Cilik tiba di ' + cp.label + '! Klik "Buka Stesen Semasa" untuk mula.');
+            }
+        });
+    }
+
+    function stepStation(direction) {
+        const idx = orderedKeys.indexOf(currentKey);
+        const nextIdx = Math.max(0, Math.min(orderedKeys.length - 1, idx + direction));
+        const nextKey = orderedKeys[nextIdx];
+        // Berjalan dari stesen ke stesen tanpa menutup peta secara paksa
+        walkToCheckpoint(nextKey, false);
+    }
+
+    function openCurrentCheckpoint() {
+        const cp = checkpoints[currentKey];
+        if (cp && cp.modal) {
+            openModal(cp.modal);
+        } else {
+            walkToCheckpoint(currentKey, true);
+        }
+    }
+
+    // Sokongan Kekunci Anak Panah (Kiri / Kanan / Enter)
+    window.addEventListener('keydown', (e) => {
+        const anyModalOpen = document.querySelector('.modal-overlay.active');
+        if (anyModalOpen) return;
+        if (e.key === 'ArrowRight') stepStation(1);
+        if (e.key === 'ArrowLeft') stepStation(-1);
+        if (e.key === 'Enter') openCurrentCheckpoint();
+    });
+
+    // ======================== MODAL & TOAST UI ========================
+    let toastTimer = null;
+    function showToast(msg) {
+        const t = document.getElementById('map-toast');
+        t.textContent = msg;
+        t.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => t.classList.remove('show'), 3400);
+    }
+
+    function openModal(id) {
+        if (id === 'modal-skor') renderSkorBreakdown();
+        document.getElementById(id).classList.add('active');
+    }
+
+    function closeModal(id) {
+        document.getElementById(id).classList.remove('active');
+    }
+
+    // ======================== SISTEM SKOR & SEMAKAN AKTIVITI ========================
+    const scores = {
+        stesen1: 0,
+        stesen2: 0,
+        stesen3: 0,
+        kuiz: 0,
+        ayat: 0,
+        sun1: 0,
+        sun2: 0
+    };
+
+    function updateScoreBoard() {
+        const total = Object.values(scores).reduce((a, b) => a + b, 0);
+        document.getElementById('skor-val').textContent = total;
+        const pct = Math.min(100, Math.max(15, Math.round((total / 120) * 100)));
+        document.getElementById('progress-fill').style.width = pct + '%';
+    }
+
+    function renderSkorBreakdown() {
+        const total = Object.values(scores).reduce((a, b) => a + b, 0);
+        document.getElementById('skor-breakdown').innerHTML = `
+            <div>🪥 Stesen 1 (Gigi Sihat): <strong>${scores.stesen1} / 30</strong></div>
+            <div>🛁 Stesen 2 (Mandi Bersih): <strong>${scores.stesen2} / 30</strong></div>
+            <div>👕 Stesen 3 (Baju Wangi): <strong>${scores.stesen3} / 30</strong></div>
+            <div>⚡ Kotak [?] Kuiz Kilat: <strong>${scores.kuiz} / 20</strong></div>
+            <div>✍️ Kotak [?] Bina Ayat: <strong>${scores.ayat} / 30</strong></div>
+            <div>☀️ Bonus Matahari Ceria: <strong>${scores.sun1 + scores.sun2} / 10</strong></div>
+            <hr style="border:1px dashed #cca96e; margin:10px 0;">
+            <div style="font-size:1.25rem; color:#2b6cb0;">⭐ Jumlah Skor Keseluruhan: ${total}</div>
+        `;
+    }
+
+    // Drag & Drop / Tap untuk Stesen 1
+    let picked = null;
+    function allow(ev) { ev.preventDefault(); }
+    function drag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+
+    function dropSense(ev) {
+        ev.preventDefault();
+        const id = ev.dataTransfer.getData("text");
+        const el = document.getElementById(id);
+        if (el) {
+            ev.currentTarget.appendChild(el);
+            playTone(500, 0.08);
+        }
+    }
+
+    function tapWord(ev, el) {
+        ev.stopPropagation();
+        document.querySelectorAll('.draggable').forEach(d => d.classList.remove('selected'));
+        picked = el;
+        el.classList.add('selected');
+        playTone(440, 0.06);
+    }
+
+    function tapBox(box) {
+        if (picked) {
+            box.appendChild(picked);
+            picked.classList.remove('selected');
+            picked = null;
+            playTone(540, 0.08);
+        }
+    }
+
+    function semakStesen1() {
+        let betul = 0;
+        document.querySelectorAll('#modal-stesen1 .drop-box').forEach(box => {
+            const senseType = box.getAttribute('data-sense');
+            Array.from(box.children).forEach(child => {
+                if (child.getAttribute('data-sense') === senseType) {
+                    betul++;
+                    child.style.background = '#b7f7c4';
+                    child.style.borderColor = '#1e7e34';
+                } else {
+                    child.style.background = '#ffd6d6';
+                    child.style.borderColor = '#c82333';
+                }
+            });
+        });
+
+        scores.stesen1 = betul * 5;
+        updateScoreBoard();
+        playSuccessSound();
+
+        const fb = document.getElementById('fb-stesen1');
+        fb.style.background = betul === 6 ? '#d4edda' : '#fff3cd';
+        fb.innerHTML = betul === 6
+            ? '🌟 Tahniah! Semua 6 kata adjektif pancaindera di Stesen 1: Gigi Sihat tepat! (+30 Skor)'
+            : `Anda mendapat ${betul}/6 betul (+${betul * 5} Skor). Betulkan buih yang berwarna merah!`;
+    }
+
+    function semakStesen2() {
+        const g1 = document.querySelector('input[name="g1"]:checked')?.value;
+        const g2 = document.querySelector('input[name="g2"]:checked')?.value;
+        const g3 = document.querySelector('input[name="g3"]:checked')?.value;
+        let betul = 0;
+        if (g1 === 'segar_wangi') betul++;
+        if (g2 === 'licin') betul++;
+        if (g3 === 'busuk') betul++;
+
+        scores.stesen2 = betul * 10;
+        updateScoreBoard();
+        playSuccessSound();
+
+        const fb = document.getElementById('fb-stesen2');
+        fb.style.background = betul === 3 ? '#d4edda' : '#d1ecf1';
+        fb.innerHTML = `🛁 Skor Stesen 2: ${betul}/3 betul (+${betul * 10} Skor). ${betul === 3 ? 'Syabas! Badan segar dan wangi! 🏆' : 'Cuba semak semula jawapan anda!'}`;
+    }
+
+    function semakStesen3() {
+        const b1 = document.getElementById('baju1').value;
+        const b2 = document.getElementById('baju2').value;
+        const b3 = document.getElementById('baju3').value;
+        let betul = 0;
+        if (b1 === 'bersih') betul++;
+        if (b2 === 'lembut') betul++;
+        if (b3 === 'wangi') betul++;
+
+        scores.stesen3 = betul * 10;
+        updateScoreBoard();
+        playSuccessSound();
+
+        const fb = document.getElementById('fb-stesen3');
+        fb.style.background = betul === 3 ? '#d4edda' : '#fff3cd';
+        fb.innerHTML = betul === 3
+            ? '👕 Hebat! Semua jawapan di Stesen 3: Baju Wangi betul! (+30 Skor)'
+            : `Anda mendapat ${betul}/3 betul (+${betul * 10} Skor). Cuba lagi!`;
+    }
+
+    function semakKuizKilat() {
+        const j = document.querySelector('input[name="kuiz_bonus"]:checked')?.value;
+        const fb = document.getElementById('fb-kuiz');
+        if (j === 'betul') {
+            scores.kuiz = 20;
+            updateScoreBoard();
+            playSuccessSound();
+            fb.style.background = '#d4edda';
+            fb.innerHTML = '🎉 Tepat sekali! "Lembut" dikesan melalui Deria Sentuhan (Tangan). (+20 Skor)';
+        } else {
+            fb.style.background = '#f8d7da';
+            fb.innerHTML = '⚠️ Belum tepat. Cuba fikirkan deria manakah yang mengesan sifat "Lembut".';
+        }
+    }
+
+    function semakBinaAyat() {
+        const a1 = document.getElementById('ay1').value.trim();
+        const a2 = document.getElementById('ay2').value.trim();
+        const a3 = document.getElementById('ay3').value.trim();
+        const fb = document.getElementById('fb-ayat');
+
+        if (a1 && a2 && a3) {
+            scores.ayat = 30;
+            updateScoreBoard();
+            playSuccessSound();
+            fb.style.background = '#d4edda';
+            fb.innerHTML = '✅ Syabas! Ketiga-tiga ayat pancaindera berjaya dibina! (+30 Skor)';
+        } else {
+            fb.style.background = '#f8d7da';
+            fb.innerHTML = '⚠️ Sila lengkapkan ketiga-tiga ayat terlebih dahulu.';
+        }
+    }
+
+    function resetGame() {
+        Object.keys(scores).forEach(k => scores[k] = 0);
+        updateScoreBoard();
+        closeModal('modal-menu');
+        walkCharacterTo('start');
+        showToast('🔄 Permainan telah diulang semula!');
+    }
+</script>
+
+</body>
+</html>
